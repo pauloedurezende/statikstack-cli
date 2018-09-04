@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.1.0
+
+- **refactor:** change the format of repositories list
+
 ## v1.0.0
 
 - add all remaining kits created by the project
