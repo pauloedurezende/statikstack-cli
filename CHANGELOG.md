@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.2.0
+
+- **feat:** add question to folder name
+- add file to store the questions
+
 ## v1.1.0
 
 - **refactor:** change the format of repositories list
