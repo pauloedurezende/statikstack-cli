@@ -1,6 +1,8 @@
 const { type } = require('os');
 const { cwd } = require('process');
 const { readdirSync } = require('fs');
+const { exec } = require('child_process');
+const { log } = require('console');
 
 function removeDir(folder) {
   if (type() === 'Linux' || type() === 'Darwin') {
@@ -24,4 +26,19 @@ function validateFolder(folderName) {
   return folderExist;
 }
 
-module.exports = { removeDir, validateFolder };
+function downloadRepo(repositorie, folder) {
+  log('Starting the project download...');
+
+  return new Promise((resolve, reject) => {
+    exec(
+      `git clone https://github.com/statikstack/${repositorie} ${folder}`,
+      (err) => {
+        if (err) reject(err);
+
+        resolve('The Project have been downloaded!');
+      }
+    );
+  });
+}
+
+module.exports = { removeDir, validateFolder, downloadRepo };
