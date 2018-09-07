@@ -1,4 +1,6 @@
 const { type } = require('os');
+const { cwd } = require('process');
+const { readdirSync } = require('fs');
 
 function removeDir(folder) {
   if (type() === 'Linux' || type() === 'Darwin') {
@@ -7,4 +9,19 @@ function removeDir(folder) {
   return `rmdir /s /q ${folder}`;
 }
 
-module.exports = { removeDir };
+function validateFolder(folderName) {
+  let folderExist;
+  const folders = readdirSync(cwd());
+
+  folders.forEach((folder) => {
+    if (folder === folderName.toLowerCase()) {
+      folderExist = true;
+      return;
+    }
+    folderExist = false;
+  });
+
+  return folderExist;
+}
+
+module.exports = { removeDir, validateFolder };
