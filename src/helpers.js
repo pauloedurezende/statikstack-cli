@@ -16,7 +16,7 @@ function validateFolder(folderName) {
   const folders = readdirSync(cwd());
 
   folders.forEach((folder) => {
-    if (folder === folderName.toLowerCase()) {
+    if (folder.toLowerCase() === folderName.toLowerCase()) {
       folderExist = true;
       return;
     }
