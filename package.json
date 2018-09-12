@@ -1,9 +1,9 @@
 {
-  "name": "statikstack-project-generator",
+  "name": "statikstack-cli",
   "version": "1.2.0",
-  "description": "A project generator for Statik Stack repositories",
+  "description": "The command-line interface for create projects using Statik Stack",
   "author": "Paulo Rezende <rezendepauloedu@outlook.com>",
-  "homepage": "https://github.com/pauloedurezende/statikstack-project-generator#readme",
+  "homepage": "https://github.com/pauloedurezende/statikstack-cli#readme",
   "keywords": [
     "node"
   ],
@@ -16,10 +16,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/pauloedurezende/statikstack-project-generator.git"
+    "url": "https://github.com/pauloedurezende/statikstack-cli.git"
   },
   "bugs": {
-    "url": "https://github.com/pauloedurezende/statikstack-project-generator/issues"
+    "url": "https://github.com/pauloedurezende/statikstack-cli/issues"
   },
   "dependencies": {
     "inquirer": "6.2.0"
