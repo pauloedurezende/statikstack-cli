@@ -1,28 +1,49 @@
-const repositories = require('./repositories');
-const { validateFolder } = require('./helpers');
+const { validateFolder, createChoiceList } = require('./helpers');
 
-module.exports = [
-  {
-    name: 'selectedRepo',
-    type: 'list',
-    message: 'Which project would you like to generate?',
-    choices: repositories.map((repo) => repo)
-  },
-  {
-    name: 'folderName',
-    type: 'input',
-    message: 'Enter the name of your project',
-    validate(name) {
-      const folderExist = validateFolder(name);
+function populateQuestions(repositories) {
+  return [
+    {
+      name: 'folder',
+      type: 'input',
+      message: 'Enter the name of your project',
+      validate(name) {
+        const folderExist = validateFolder(name);
 
-      if (folderExist) {
-        return 'There is already a project with this name!';
+        if (folderExist) {
+          return 'There is already a project with this name';
+        }
+
+        if (name === '') {
+          return 'Please enter a name for your project';
+        }
+        return true;
       }
-
-      if (name === '') {
-        return 'Please enter a name for the folder';
-      }
-      return true;
+    },
+    {
+      name: 'markup',
+      type: 'list',
+      message: 'Choose a markup language',
+      choices: createChoiceList(repositories, 'markup')
+    },
+    {
+      name: 'style',
+      type: 'list',
+      message: 'Choose a style language',
+      choices: createChoiceList(repositories, 'style')
+    },
+    {
+      name: 'script',
+      type: 'list',
+      message: 'Choose a script language',
+      choices: createChoiceList(repositories, 'script')
+    },
+    {
+      name: 'bundler',
+      type: 'list',
+      message: 'Choose a bundler',
+      choices: createChoiceList(repositories, 'bundler')
     }
-  }
-];
+  ];
+}
+
+module.exports = populateQuestions;
