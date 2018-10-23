@@ -1,10 +1,108 @@
-const { type } = require('os');
-const { cwd } = require('process');
-const { readdirSync } = require('fs');
-const { exec } = require('child_process');
-const { log } = require('console');
 const fetch = require('node-fetch');
+const inquirer = require('inquirer');
 const _ = require('lodash');
+const { type } = require('os');
+const { exec } = require('child_process');
+
+const { kitQuestion } = require('./questions');
+
+function downloadKitList(url, callback) {
+  fetch(url)
+    .then((kitList) => kitList.json())
+    .then((kitList) => callback(null, {}, kitList))
+    .catch(() =>
+      callback(
+        'Oops! Unable to purchase list of kits, please, try again later!'
+      )
+    );
+}
+
+function showConsoleMessage(message, answers = {}, kitList = [], callback) {
+  console.log(`\n${message}`);
+
+  callback(null, answers, kitList);
+}
+
+function showGenericQuestion(question, answers = {}, kitList = [], callback) {
+  inquirer
+    .prompt(question)
+    .then((answer) => callback(null, { ...answers, ...answer }, kitList));
+}
+
+function unionQuestion(kitType, answers = {}, kitList = [], callback) {
+  const choices = _.union([], kitList.map((item) => item[kitType]));
+
+  callback(null, answers, kitList, choices);
+}
+
+function showKitQuestion(
+  kitType,
+  answers = {},
+  kitList = [],
+  choices = [],
+  callback
+) {
+  inquirer
+    .prompt(kitQuestion(kitType, choices))
+    .then((answer) =>
+      callback(
+        null,
+        { ...answers, kit: { ...answers.kit, ...answer } },
+        kitList
+      )
+    );
+}
+
+function filterKitList(kitType, answers = {}, kitList = [], callback) {
+  let filter;
+
+  switch (kitType) {
+    case 'markup':
+      filter = { markup: answers.kit.markup };
+      break;
+    case 'style':
+      filter = { markup: answers.kit.markup, style: answers.kit.style };
+      break;
+    case 'script':
+      filter = {
+        markup: answers.kit.markup,
+        style: answers.kit.style,
+        script: answers.kit.script
+      };
+      break;
+    case 'bundler':
+      filter = {
+        markup: answers.kit.markup,
+        style: answers.kit.style,
+        script: answers.kit.script,
+        bundler: answers.kit.bundler
+      };
+      break;
+    default:
+      break;
+  }
+
+  const filteredKitList = _.filter(kitList, filter);
+
+  callback(null, answers, filteredKitList);
+}
+
+function downloadStarterKit(answers = {}, kitList = [], callback) {
+  const { markup, style, script, bundler } = answers.kit;
+  const { folder } = answers;
+
+  exec(
+    `git clone https://github.com/statikstack/${markup}-${style}-${script}-${bundler} ${folder}`,
+    (err) => {
+      if (err) {
+        return callback(err);
+      }
+
+      callback(null, answers, kitList);
+      return true;
+    }
+  );
+}
 
 function removeDir(folder) {
   if (type() === 'Linux' || type() === 'Darwin') {
@@ -13,46 +111,26 @@ function removeDir(folder) {
   return `rmdir /s /q ${folder}`;
 }
 
-function validateFolder(folderName) {
-  let folderExist;
-  const folders = readdirSync(cwd());
+function downloadDependencies(answers = {}, kitList = [], callback) {
+  const { folder } = answers;
 
-  folders.forEach((folder) => {
-    if (folder.toLowerCase() === folderName.toLowerCase()) {
-      folderExist = true;
-      return;
+  exec(`cd ${folder} && ${removeDir('.git')} && npm install`, (err) => {
+    if (err) {
+      return callback(err);
     }
-    folderExist = false;
+
+    callback(null, answers, kitList);
+    return true;
   });
-
-  return folderExist;
-}
-
-function downloadKit(repositorie, folder) {
-  return new Promise((resolve, reject) => {
-    exec(
-      `git clone https://github.com/statikstack/${repositorie} ${folder}`,
-      (err) => {
-        if (err) reject(err);
-
-        resolve();
-      }
-    );
-  });
-}
-
-function downloadKitList(url) {
-  return fetch(url).then((res) => res.json());
-}
-
-function createChoiceList(originalList, listType) {
-  return _.union([], originalList.map((item) => item[listType]));
 }
 
 module.exports = {
-  removeDir,
-  validateFolder,
-  downloadKit,
   downloadKitList,
-  createChoiceList
+  showConsoleMessage,
+  showGenericQuestion,
+  unionQuestion,
+  showKitQuestion,
+  filterKitList,
+  downloadStarterKit,
+  downloadDependencies
 };
