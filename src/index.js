@@ -16,7 +16,7 @@ const { folderName } = require('./questions');
 waterfall(
   [
     // Download the list of repositories
-    apply(downloadKitList, 'http://127.0.0.1:8887/repositories.json'),
+    apply(downloadKitList, 'https://statik.now.sh/assets/repositories.json'),
     apply(showConsoleMessage, '🔥  Welcome to Statik!\n'),
     apply(showGenericQuestion, folderName),
     // Markup
